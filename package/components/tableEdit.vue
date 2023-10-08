@@ -208,7 +208,6 @@ export default {
         handle: '.vue-sortable',
         filter: '.not-sortable',  // 过滤.not-sort的元素
         async onEnd({ newIndex, oldIndex }) {
-          console.log(oldIndex);
           _this.$emit('handleSort', { newIndex, oldIndex })
         }
       })

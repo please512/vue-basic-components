@@ -50,7 +50,7 @@ export default {
     // 当前值
     width: {
       type: Number,
-      default: 0
+      default: 200
     }
   },
   data() {

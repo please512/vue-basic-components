@@ -9,8 +9,8 @@
         <template slot-scope="scope">
           <div>
             <span v-if="column.filed !== 'fileName'">{{ scope.row[column.filed] }}</span>
-            <span v-if="column.filed === 'fileName' && componentDisabled && !couldApprovingView">{{ scope.row[column.filed] }}</span>
-            <el-link v-if="column.filed === 'fileName' && (!componentDisabled || couldApprovingView)" type="primary" @click="column.click(scope.row)">
+            <span v-if="column.filed === 'fileName' && componentDisabled">{{ scope.row[column.filed] }}</span>
+            <el-link v-if="column.filed === 'fileName' && !componentDisabled" type="primary" @click="column.click(scope.row)">
               {{ scope.row[column.filed] }}
             </el-link>
           </div>
@@ -63,29 +63,12 @@ export default {
       default: 80
     }
   },
-  watch: {
-    $route: {
-      async handler(value) {
-        const { id } = value.params
-        const { workflowId, version } = value.query
-        const versionList = await this.$store.dispatch('getVersionList', id)
-        const currentVersion = versionList?.find((s) => s.version === version)
-        if (currentVersion.status == 1 && workflowId) {
-          // 工作流页面 且 审核中版本，支持查看相关附件
-          this.couldApprovingView = true
-        }
-      },
-      deep: true,
-      immediate: true
-    }
-  },
   data() {
     return {
       file: null,
       tableLoading: false,
       componentDisabled: null,
-      selection: [],
-      couldApprovingView: false
+      selection: []
     }
   },
   created() {},

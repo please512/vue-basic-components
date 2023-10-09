@@ -1,6 +1,6 @@
 {
   "name": "vue-basic-components",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -44,7 +44,8 @@
   "keywords": [
     "vue组件",
     "表格可修改",
-    "表单"
+    "表单",
+    "双表格穿梭框"
   ],
   "author": "",
   "license": "ISC"

@@ -72,10 +72,10 @@
               <el-button
                 class="action-button"
                 v-if="button.visible"
-                :type="button.type"
+                :type="button.type || 'success'"
                 :loading="button.loading"
                 :disabled="button.disabled"
-                :size="button.size"
+                :size="button.size || 'mini'"
                 @click="button.clicked"
               >
                 {{ button.text }}
@@ -101,7 +101,22 @@ export default {
       componentDisabled: null
     }
   },
-  created() {}
+  created() {},
+  methods: {
+    getFormData() {
+      return this.data
+    },
+    validate() {
+      let len = this.data.length
+      for (let i = 0; i < len; i++) {
+        let item = this.data[i]
+        if (item.validator && !item.validator(item.value)) {
+          return false
+        }
+      }
+      return true
+    }
+  }
 }
 </script>
 

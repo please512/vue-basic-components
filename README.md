@@ -6,6 +6,8 @@
 
 vue 项目基础组件库（编辑表格、编辑表单、编辑上传表格、拖拽进度块）
 
+文档中若有样例可参考，无样例可参考代码使用（若代码垃圾请海涵）
+
 ### **安装**：
 
 ```
@@ -87,6 +89,12 @@ isAddedTrigger：是否自定义添加表格行，若为true需要在父组件�
 />
 ```
 
+![Image text](./package/images/table-edit-static-1.png)
+
+![Image text](./package/images/table-edit-edit-1.png)
+
+![Image text](./package/images/table-edit-static-2.png)
+
 
 
 #### 2，TableForm 组件
@@ -142,6 +150,13 @@ actions.valueFormat----支持表单域类型为date
 
 ```
 
+![Image text](./package/images/table-form-static-1.png)
+
+![Image text](./package/images/table-form-edit-1.png)
+
+![Image text](./package/images/table-form-static-2.png)
+
+
 #### 3，TableUpload 组件
 
 ###### 属性(refs调用)
@@ -188,6 +203,11 @@ fileList：文件列表
 
 ```
 
+![Image text](./package/images/table-upload-static-1.png)
+
+![Image text](./package/images/table-upload-edit-1.png)
+
+
 #### 4，DragProgress 组件
 
 ###### props
@@ -213,3 +233,17 @@ bgColor：进度条颜色
 />
 
 ```
+
+![Image text](./package/images/drag-progress-1.png)
+
+
+#### 5，SelectPerson 组件
+
+![Image text](./package/images/select-person-1.png)
+
+![Image text](./package/images/select-person-2.png)
+
+
+#### 6，TableTransmitter 组件
+
+![Image text](./package/images/table-transmitter-1.png)

@@ -3,7 +3,86 @@
     <div v-if="title" class="title">
       <p>{{ title }} <span v-if="required" style="color: red">*</span></p>
     </div>
-    <el-table row-key="id" border v-loading="tableLoading" element-loading-text="正在加载数据..." @selection-change="handleSelectionChange" :data="tableList">
+    <el-table v-if="tableHeight" :height="tableHeight" row-key="id" border v-loading="tableLoading" element-loading-text="正在加载数据..." @selection-change="handleSelectionChange" :data="tableList">
+      <el-table-column :type="type" label="序号" align="center" />
+      <el-table-column v-for="column in columns" :key="column.label" align="center" :width="column.width ? column.width : 'auto'">
+        <template slot="header">
+          {{ column.label }}
+          <span v-if="column.required" style="color: red"> *</span>
+        </template>
+        <template slot-scope="scope">
+          <div>
+            <template>
+              <!-- 点击当列text跳转链接 -->
+              <span
+                v-if="(column.type === 'text' && column.linkable) || (column.type === 'input' && componentDisabled && column.linkable)"
+                style="font-size: 14px; color: #409eff; cursor: pointer"
+                @click="column.clicked(scope.row)"
+                >{{ scope.row[column.filed] }}</span
+              >
+              <span v-if="column.type === 'text' && !column.linkable" style="font-size: 14px">{{ scope.row[column.filed] }}</span>
+              <!-- 点击当列text跳转链接 -->
+
+              <!-- 当列input和禁用显示 -->
+              <span v-if="column.type === 'input' && componentDisabled && !column.linkable" style="font-size: 14px">{{ scope.row[column.filed] }}</span>
+              <el-input
+                v-if="column.type === 'input' && !componentDisabled"
+                :disabled="componentDisabled || column.disabled"
+                size="mini"
+                v-model="scope.row[column.filed]"
+                :placeholder="'请输入' + column.label"
+                @blur="column.onblur ? column.onblur(scope.$index) : () => {}"
+              ></el-input>
+              <!-- 当列input和禁用显示 -->
+
+              <!-- 当列date和禁用显示 -->
+              <span v-if="column.type === 'date' && componentDisabled" style="font-size: 14px">{{
+                scope.row[column.filed] ? scope.row[column.filed].slice(0, 10) : ''
+              }}</span>
+              <el-date-picker
+                :disabled="componentDisabled || column.disabled"
+                v-if="column.type === 'date' && !componentDisabled"
+                v-model="scope.row[column.filed]"
+                :type="column.pickerType"
+                :format="column.format"
+                :value-format="column.valueFormat"
+                size="mini"
+                :placeholder="'请选择' + column.label"
+              >
+              </el-date-picker>
+              <!-- 当列date和禁用显示 -->
+
+              <!-- 当列select和禁用显示 -->
+              <span v-if="(column.type === 'select' && componentDisabled) || column.type === 'select-text'" style="font-size: 14px">
+                {{ column.options.find((s) => s.value == scope.row[column.filed]) ? column.options.find((s) => s.value == scope.row[column.filed]).label : '' }}
+              </span>
+              <el-select
+                :disabled="componentDisabled || column.disabled"
+                v-if="column.type === 'select' && !componentDisabled"
+                size="mini"
+                v-model="scope.row[column.filed]"
+                :placeholder="'请选择' + column.label"
+              >
+                <el-option v-for="option in column.options" :key="option.label" :label="option.label" :value="option.value"> </el-option>
+              </el-select>
+              <!-- 当列select和禁用显示 -->
+            </template>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="(deletable || sortable) && !componentDisabled" label="操作" :width="actionColumnWidth" align="center">
+        <template slot-scope="scope">
+          <el-button v-if="sortable" :class="componentDisabled? 'not-sortable': 'vue-sortable'" :disabled="componentDisabled" icon="el-icon-sort" size="mini" :type="componentDisabled? 'info': 'warning'"
+            >排序</el-button
+          >
+          <el-button v-if="deletable" :disabled="componentDisabled" icon="el-icon-delete" size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)"
+            >删除</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+    
+    <el-table v-if="!tableHeight" row-key="id" border v-loading="tableLoading" element-loading-text="正在加载数据..." @selection-change="handleSelectionChange" :data="tableList">
       <el-table-column :type="type" label="序号" align="center" />
       <el-table-column v-for="column in columns" :key="column.label" align="center" :width="column.width ? column.width : 'auto'">
         <template slot="header">
@@ -86,11 +165,12 @@
     </div>
     <el-pagination
       v-if="tableList && tableList.length && isPagination"
-      @size-change="currentPageChange"
+      @size-change="pageSizeChange"
       @current-change="currentPageChange"
       :current-page.sync="currentPage"
+      :page-sizes="pageSizes"
       :page-size="pageSize"
-      layout="total, prev, pager, next, jumper"
+      :layout="layout"
       :total="total"
     >
     </el-pagination>
@@ -152,13 +232,23 @@ export default {
       type: Boolean,
       default: false
     },
-    pageSize: {
-      type: Number,
-      default: 14
-    },
     // handleAdd事件是否触发
     isAddedTrigger: {
       type: Boolean
+    },
+    pageSizes: {
+      type: Array,
+      default: () => {
+        return [20, ,30, 50, 100, 200, 500]
+      }
+    },
+    tableHeight: {
+      type: String,
+      default: ''
+    },
+    layout: {
+      type: String,
+      default: 'total, sizes, prev, pager, next, jumper'
     }
   },
   watch: {
@@ -192,6 +282,7 @@ export default {
       tableLoading: false,
       componentDisabled: null,
       currentPage: 1,
+      pageSize: 20,
       total: 0,
       data: [],
       tableList: [],
@@ -214,6 +305,10 @@ export default {
     },
     handleSelectionChange(val) {
       this.selection = val
+    },
+    pageSizeChange(val) {
+      this.pageSize = val
+      this.currentPageChange(1)
     },
     currentPageChange(val) {
       this.currentPage = val

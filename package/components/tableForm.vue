@@ -2,7 +2,7 @@
   <div class="table-form-container">
     <el-col :span="item.span === undefined ? 12 : item.span" class="part" style="padding: 0" v-for="item in data" :key="item.label">
       <div class="form-item" v-if="item.triggerShow === undefined || item.triggerShow === true">
-        <div class="label">
+        <div class="label" :style="`width: ${item.labelWidth? item.labelWidth: 160}px;`">
           <span>{{ item.label }}</span>
           <span v-if="item.require" style="color: #f56c6c; margin-left: 3px">*</span>
         </div>
@@ -141,7 +141,6 @@ export default {
 }
 .label {
   box-sizing: border-box;
-  width: 160px;
   color: #666;
   background: #f8f8f9;
   border-left: 1px #dfe6ec solid;
